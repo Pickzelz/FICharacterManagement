@@ -7,11 +7,18 @@ public class Character : MonoBehaviour {
     public FICharacterFirstPersonController control;
     public FIGun gun;
 
+    [Header("Character Status")]
+    public int Health = 100;
+
     //private
     private Vector3 bulletVelocity;
+    private GameManager _manager;
 
 	// Use this for initialization
 	void Start () {
+        _manager = GameManager.Instance;
+        _manager.characterObject = gameObject;
+
         control.Init(gameObject);
         gun.Init();
 	}
@@ -30,6 +37,10 @@ public class Character : MonoBehaviour {
         else if(Input.GetButtonUp("Fire1"))
         {
             gun.PrepareForNewShoot();
+        }
+        else if(Input.GetButtonDown("Jump"))
+        {
+            control.Jump();
         }
         //bulletVelocity = gun.bulletPlaceholder.transform.forward * 100f;
         //Vector3 firstPosition = gun.bulletPlaceholder.transform.position;

@@ -9,6 +9,10 @@ public class FICharacterFirstPersonController{
     public GameObject characterObject;
     public Camera cam;
 
+    [Header("Character Status")]
+    public float JumpPower;
+    public float GroundDistance;
+
     [Header("Options")]
     public float speed = 5f;
     public float sensitivityX;
@@ -35,6 +39,16 @@ public class FICharacterFirstPersonController{
         CameraRotationBasedOnMouse();
     }
 
+    public void Jump()
+    {
+        Debug.Log("Jump");
+        Vector3 checkGround = characterObject.transform.TransformDirection(Vector3.down);
+        if (Physics.Raycast(characterObject.transform.position, checkGround, 0.5f))
+        {
+            rb.AddForce(characterObject.transform.up * JumpPower, ForceMode.Impulse);
+        }
+    }
+
     void MoveCharacter()
     {
         Vector3 currentPosition = characterObject.transform.position;
@@ -57,4 +71,6 @@ public class FICharacterFirstPersonController{
         float rotateY = Input.GetAxisRaw("Mouse X");
         rb.MoveRotation(rb.rotation * Quaternion.Euler(new Vector3(0, rotateY, 0) * sensitivityY));
     }
+
+    
 }
