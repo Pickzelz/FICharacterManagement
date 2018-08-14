@@ -46,13 +46,13 @@ public class FICharacterFirstPersonController:FICharacter{
         CameraRotationBasedOnMouse();
     }
 
-    void Jump()
+    public void Jump()
     {
         Debug.Log("Jump");
-        Vector3 checkGround = transform.TransformDirection(Vector3.down);
-        if (Physics.Raycast(transform.position, checkGround, 0.5f))
+        Vector3 checkGround = characterObject.transform.TransformDirection(Vector3.down);
+        if (Physics.Raycast(characterObject.transform.position, checkGround, 0.5f))
         {
-            rb.AddForce(transform.up * JumpPower, ForceMode.Impulse);
+            rb.AddForce(characterObject.transform.up * JumpPower, ForceMode.Impulse);
         }
     }
 
