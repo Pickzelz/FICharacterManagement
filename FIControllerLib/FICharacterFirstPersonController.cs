@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public class FICharacterFirstPersonController{
+public class FICharacterFirstPersonController:FICharacter{
 
     [Header("Character Object")]
-    public GameObject characterObject;
     public Camera cam;
+
+    [Header("Character Status")]
+    public float JumpPower;
+    public float GroundDistance;
 
     [Header("Options")]
     public float speed = 5f;
@@ -22,24 +25,42 @@ public class FICharacterFirstPersonController{
     object method;
     Rigidbody rb;
 
-    public void Init(GameObject charObject)
+    void Start()
     {
-        characterObject = charObject;
-        rb = characterObject.GetComponent<Rigidbody>();
+        rb = GetComponent<Rigidbody>();
         rotateXAccumulation = 0;
     }
 
-    public void Move()
+    private void FixedUpdate()
+    {
+        Move();
+        if(Input.GetButton("Jump"))
+        {
+            Jump();
+        }
+    }
+
+    void Move()
     {
         MoveCharacter();
         CameraRotationBasedOnMouse();
     }
 
+    void Jump()
+    {
+        Debug.Log("Jump");
+        Vector3 checkGround = transform.TransformDirection(Vector3.down);
+        if (Physics.Raycast(transform.position, checkGround, 0.5f))
+        {
+            rb.AddForce(transform.up * JumpPower, ForceMode.Impulse);
+        }
+    }
+
     void MoveCharacter()
     {
-        Vector3 currentPosition = characterObject.transform.position;
-        Vector3 _moveForward = characterObject.transform.forward * Input.GetAxisRaw("Vertical");
-        Vector3 _moveSide = characterObject.transform.right * Input.GetAxisRaw("Horizontal");
+        Vector3 currentPosition = transform.position;
+        Vector3 _moveForward = transform.forward * Input.GetAxisRaw("Vertical");
+        Vector3 _moveSide = transform.right * Input.GetAxisRaw("Horizontal");
         Vector3 _move = (_moveForward.normalized + _moveSide).normalized * speed * Time.fixedDeltaTime;
 
         rb.MovePosition(rb.position + _move);
@@ -57,4 +78,6 @@ public class FICharacterFirstPersonController{
         float rotateY = Input.GetAxisRaw("Mouse X");
         rb.MoveRotation(rb.rotation * Quaternion.Euler(new Vector3(0, rotateY, 0) * sensitivityY));
     }
+
+    
 }
