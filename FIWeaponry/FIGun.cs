@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public class FIGun {
+public class FIGun : FIWeapon{
 
     public enum StateMachine { STATE_IDLE, STATE_SHOOTING, STATE_WAITING_NEXT_SHOOT, STATE_FINISH_SHOOT, STATE_COUNT }
 
     [Header("Gun Object")]
-    public GameObject GunObject;
     public ParticleSystem gunParticle;
     public bool isUseTrajectory = false;
     public GameObject bulletPrefabs;
@@ -30,9 +29,9 @@ public class FIGun {
 
     float t_time = 0;
 
-    public void Init()
+    void Start()
     {
-        currentPosition = GunObject.transform.localPosition;
+        currentPosition = transform.localPosition;
     }
 
 	public void Attack()
@@ -49,11 +48,24 @@ public class FIGun {
         currentState = StateMachine.STATE_IDLE;
     }
 
-    public void Update()
+    private void FixedUpdate()
     {
-        if(GunObject.transform.localPosition != currentPosition)
+        StateMachineUpdate();
+        if(Input.GetButtonDown("Fire1"))
         {
-            GunObject.transform.localPosition = Vector3.Lerp(GunObject.transform.localPosition, currentPosition, 0.1f);
+            Attack();
+        }
+        else if(Input.GetButtonUp("Fire1"))
+        {
+            PrepareForNewShoot();
+        }
+    }
+
+    public void StateMachineUpdate()
+    {
+        if(transform.localPosition != currentPosition)
+        {
+            transform.localPosition = Vector3.Lerp(transform.localPosition, currentPosition, 0.1f);
         }
         switch(currentState)
         {
@@ -97,8 +109,8 @@ public class FIGun {
 
     private void Recoil()
     {
-        Vector3 recoilPos = GunObject.transform.localPosition - recoilRatePosition;
-        GunObject.transform.localPosition = recoilPos;
+        Vector3 recoilPos = transform.localPosition - recoilRatePosition;
+        transform.localPosition = recoilPos;
     }
 
     private void ShootWithTrajectory()
@@ -118,10 +130,8 @@ public class FIGun {
         if (Physics.Raycast(camera.transform.position, camera.transform.forward, out hit, maxRange))
         {
             Debug.DrawRay(camera.transform.position, camera.transform.forward * hit.distance, Color.red);
-            GameObject bulletO = MonoBehaviour.Instantiate(bulletPrefabs, hit.point, Quaternion.identity);
-            FIbullet bullet = bulletO.GetComponent<FIbullet>();
-            bullet.bulletObject.SetActive(false);
-            bullet.blow.Play();
+            GameObject bulletO = MonoBehaviour.Instantiate(bulletPrefabs, bulletPlaceholder.transform.position, bulletPlaceholder.transform.rotation);
+            bulletO.SetActive(true);
         }
 
     }

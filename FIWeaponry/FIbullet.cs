@@ -4,31 +4,51 @@ using UnityEngine;
 
 public class FIbullet : MonoBehaviour {
 
+    private enum E_STATE { IDLE, MOVING, HIT, E_STATE_COUNT}
+
     public float bulletSpeed;
-    public float stepPerFrame;
-
-    private Vector3 bulletVelocity = Vector3.zero;
-
-    public GameObject bulletObject;
     public ParticleSystem blow;
+
+    private E_STATE state;
+    private E_STATE previousState;
+    private Vector3 bulletVelocity = Vector3.zero;
     [HideInInspector] public Camera cam;
     [HideInInspector] public bool IsTrajectoryBullet;
 
     private void Start()
     {
         bulletVelocity = transform.forward * bulletSpeed;
+        state = E_STATE.IDLE;
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
+        StateMachine();
         if(IsTrajectoryBullet)
         {
             TrajectoryShoot();
         }
-        if(!blow.IsAlive())
+        if(state == E_STATE.HIT && !blow.IsAlive())
         {
             Destroy(gameObject);
         }
+    }
+
+    private void StateMachine()
+    {
+        if (previousState == state)
+            return;
+
+        switch(state)
+        {
+            case E_STATE.IDLE:
+                break;
+            case E_STATE.MOVING:
+                break;
+            case E_STATE.HIT:
+                break;
+        }
+        previousState = state;
     }
 
     private void TrajectoryShoot()
@@ -59,7 +79,7 @@ public class FIbullet : MonoBehaviour {
 
     public void Blow(RaycastHit hit)
     {
-        bulletObject.SetActive(false);
+        gameObject.SetActive(false);
         blow.transform.position = hit.point;
         blow.gameObject.SetActive(true);
         blow.Play();
